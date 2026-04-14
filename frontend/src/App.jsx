@@ -908,14 +908,23 @@ function PublicBookingPage() {
   const [form, setForm] = useState({ booker_name: '', booker_email: '' })
   const [submitted, setSubmitted] = useState(null)
 
+  const loadSlotsForDate = async (dateValue) => {
+    const slotData = await api.slots(slug, dateValue)
+    setSlots(slotData)
+    setSelectedSlot((current) => {
+      if (current && slotData.some((slot) => slot.start_at === current)) {
+        return current
+      }
+      return slotData[0]?.start_at || ''
+    })
+  }
+
   const load = async () => {
     setLoading(true)
     try {
       const eventData = await api.publicEvent(slug)
       setEvent(eventData)
-      const slotData = await api.slots(slug, selectedDate)
-      setSlots(slotData)
-      setSelectedSlot(slotData[0]?.start_at || '')
+      await loadSlotsForDate(selectedDate)
       setError('')
     } catch (err) {
       setError(err.message)
@@ -934,6 +943,7 @@ function PublicBookingPage() {
       .then((slotData) => {
         setSlots(slotData)
         setSelectedSlot(slotData[0]?.start_at || '')
+        setError('')
       })
       .catch((err) => setError(err.message))
   }, [selectedDate, event?.id])
@@ -941,6 +951,7 @@ function PublicBookingPage() {
   const book = async (e) => {
     e.preventDefault()
     try {
+      setError('')
       const result = await api.createBooking({
         event_type_id: event.id,
         start_at: selectedSlot,
@@ -950,6 +961,7 @@ function PublicBookingPage() {
       setSubmitted(result)
     } catch (err) {
       setError(err.message)
+      await loadSlotsForDate(selectedDate)
     }
   }
 
@@ -1013,6 +1025,7 @@ function PublicBookingPage() {
                 <p>Select a slot for {selectedDate}.</p>
               </div>
             </div>
+            {error ? <div className="error-box">{error}</div> : null}
             <SlotList slots={slots} selected={selectedSlot} onSelect={setSelectedSlot} />
             <form className="booking-form" onSubmit={book}>
               <label className="field">
