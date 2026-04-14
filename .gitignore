@@ -1,3 +1,4 @@
+.venv/
 backend/.venv/
 backend/cal_clone.db
 frontend/node_modules/

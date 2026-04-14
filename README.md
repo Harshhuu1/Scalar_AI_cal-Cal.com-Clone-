@@ -45,6 +45,55 @@ If your backend is hosted elsewhere, set:
 VITE_API_BASE_URL=http://localhost:8000
 ```
 
+## Deployment
+
+This project is easiest to deploy as:
+
+- Backend on Render
+- Frontend on Vercel
+- PostgreSQL on Render
+
+### Backend on Render
+
+Create a new Web Service from the `backend` folder and use:
+
+- Build command: `pip install -r requirements.txt`
+- Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+
+Set these environment values:
+
+- `DATABASE_URL`
+  - Use your Render PostgreSQL internal database URL
+
+The backend already supports:
+
+- SQLite for local development
+- PostgreSQL for production through `DATABASE_URL`
+
+Health check:
+
+- `/api/health`
+
+### Frontend on Vercel
+
+Create a new Vercel project using the `frontend` folder and set:
+
+- Framework preset: `Vite`
+- Build command: `npm run build`
+- Output directory: `dist`
+
+Set this environment variable:
+
+- `VITE_API_BASE_URL=https://your-render-backend-url.onrender.com`
+
+The included `frontend/vercel.json` makes React routes like `/admin`, `/book/:slug`, and `/booking/:id` work correctly on refresh.
+
+### Suggested production URLs
+
+- Public homepage: `https://your-frontend-domain.vercel.app/`
+- Public booking page: `https://your-frontend-domain.vercel.app/book/google-meet`
+- Admin dashboard: `https://your-frontend-domain.vercel.app/admin`
+
 ## Data model
 
 - `event_types`
@@ -73,3 +122,21 @@ VITE_API_BASE_URL=http://localhost:8000
 - `POST /api/bookings`
 - `GET /api/bookings?scope=upcoming|past`
 - `PATCH /api/bookings/{id}/cancel`
+<<<<<<< HEAD
+=======
+
+## Submission checklist
+
+- Push the repo to GitHub
+- Deploy the backend and confirm `/api/health` works
+- Deploy the frontend with `VITE_API_BASE_URL` set to the backend URL
+- Verify `/`, `/admin`, `/book/:slug`, and `/booking/:id`
+- Add both live links and the GitHub repo link to your submission
+
+## Interview talking points
+
+- I designed the booking logic so the backend, not just the UI, prevents double booking.
+- Availability is stored separately from bookings, which keeps the schema simple and explainable.
+- The public page reads the current slot availability from the backend every time a date changes.
+- The UI mirrors Cal.com's patterns: sidebar admin, clean cards, date picker, time slot list, and confirmation screen.
+>>>>>>> 5141bad (deployement ready !!!)
